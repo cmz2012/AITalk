@@ -88,7 +88,7 @@ common use cases and examples.
 听着勉强还行...
 
 ## 架构图
-![avatar](./script/flow.jpeg)
+![avatar](./script/flow.svg)
 
 ## 文档与资料
 * openapi: https://platform.openai.com/docs/introduction/overview

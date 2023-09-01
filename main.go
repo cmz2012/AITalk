@@ -4,9 +4,13 @@ package main
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cmz2012/AITalk/dal"
 )
 
 func main() {
+	// init
+	dal.InitClient()
+
 	h := server.Default()
 
 	register(h)

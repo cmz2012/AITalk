@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	ApiKey = "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"
+	ApiKey = "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"
 
-	SystemMessage = "I want you to act as a spoken English teacher and improver. I want you to keep your reply neat, limiting the reply to 100 words. I want you to strictly correct my grammar mistakes, typos, and factual errors."
+	SystemMessage = "You are a spoken English teacher and improver. Your reply should be limited to 100 words."
 )
 
 var (
@@ -23,9 +23,10 @@ func InitClient() {
 
 func Transcribe(ctx context.Context, audioReader io.Reader) (text string, err error) {
 	rsp, err := client.CreateTranscription(ctx, openai.AudioRequest{
-		Model:  openai.Whisper1,
-		Reader: audioReader,
-		Format: openai.AudioResponseFormatJSON,
+		Model:    openai.Whisper1,
+		Reader:   audioReader,
+		FilePath: "example.wav",
+		Format:   openai.AudioResponseFormatJSON,
 	})
 	if err != nil {
 		logrus.Errorf("[CreateTranscription]: %v", err)
@@ -48,7 +49,8 @@ func ChatCompletion(ctx context.Context, msg string) (reply string, err error) {
 				Content: msg,
 			},
 		},
-		MaxTokens: 200,
+		MaxTokens:   200,
+		Temperature: 1.0,
 	})
 	if err != nil {
 		logrus.Errorf("[ChatCompletion]: %v", err)

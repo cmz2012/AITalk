@@ -35,7 +35,7 @@ func TestText2Speech(t *testing.T) {
 				t.Errorf("Text2Speech() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			gotR.Close()
+			t.Log(gotR)
 		})
 	}
 }

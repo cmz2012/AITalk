@@ -4,6 +4,7 @@ package chat
 
 import (
 	"context"
+	"github.com/cmz2012/AITalk/biz/service"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -21,7 +22,7 @@ func CreateChat(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(chat.CreateChatResp)
+	// upgrade to websocket
+	service.ChatUpgrade(ctx, c)
 
-	c.JSON(consts.StatusOK, resp)
 }

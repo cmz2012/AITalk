@@ -12,6 +12,7 @@ func main() {
 	dal.InitClient()
 
 	h := server.Default()
+	h.NoHijackConnPool = true
 
 	register(h)
 	h.Spin()

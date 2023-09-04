@@ -19,8 +19,8 @@ func Text2Speech(ctx context.Context, text string) (out string, err error) {
 		return
 	}
 	dir := os.Getenv("CURDIR") + "/tmp/"
-	out = u.String() + ".wav"
-	cmd := exec.CommandContext(ctx, "tts", "--text", "\""+text+"\"", "--model_name", model, "--out_path", dir+out)
+	out = dir + u.String() + ".wav"
+	cmd := exec.CommandContext(ctx, "tts", "--text", "\""+text+"\"", "--model_name", model, "--out_path", out)
 	logrus.Infof("[Text2Speech]: cmd = %v", cmd.String())
 	b, err := cmd.CombinedOutput()
 	if err != nil {

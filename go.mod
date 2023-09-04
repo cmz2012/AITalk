@@ -14,8 +14,14 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/cloudwego/netpoll v0.3.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/go-audio/aiff v1.1.0 // indirect
+	github.com/go-audio/audio v1.0.0 // indirect
+	github.com/go-audio/riff v1.0.0 // indirect
+	github.com/go-audio/wav v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/google/uuid v1.3.1 // indirect
+	github.com/gordonklaus/portaudio v0.0.0-20230709114228-aafa478834f5 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 // indirect
 	github.com/hertz-contrib/websocket v0.0.1 // indirect

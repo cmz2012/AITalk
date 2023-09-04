@@ -48,7 +48,7 @@ func main() {
 			break
 		}
 		// write reply file
-		replyName := time.Now().Format(time.Kitchen) + "-reply.wav"
+		replyName := "./tmp/" + time.Now().Format(time.Kitchen) + "-reply.wav"
 		err = ioutil.WriteFile(replyName, bs, fs.ModePerm)
 		if err != nil {
 			logrus.Errorf("%v", err)

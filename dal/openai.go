@@ -5,11 +5,10 @@ import (
 	"github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
 	"io"
+	"os"
 )
 
 const (
-	ApiKey = "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"
-
 	SystemMessage = "You are a spoken English teacher and improver. Your reply should be limited to 100 words."
 )
 
@@ -18,6 +17,10 @@ var (
 )
 
 func InitClient() {
+	ApiKey := os.Getenv("OPENAIAPIKEY")
+	if ApiKey == "" {
+		panic("$OPENAIAPIKEY not setup")
+	}
 	client = openai.NewClient(ApiKey)
 }
 

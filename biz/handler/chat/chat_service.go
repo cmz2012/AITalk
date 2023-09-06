@@ -26,3 +26,35 @@ func CreateChat(ctx context.Context, c *app.RequestContext) {
 	service.ChatUpgrade(ctx, c)
 
 }
+
+// GetSessionList .
+// @router /session [GET]
+func GetSessionList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req chat.GetSessionListReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(chat.GetSessionListResp)
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GetSessionMsg .
+// @router /message [GET]
+func GetSessionMsg(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req chat.GetSessionMsgReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(chat.GetSessionMsgResp)
+
+	c.JSON(consts.StatusOK, resp)
+}

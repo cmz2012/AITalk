@@ -15,3 +15,13 @@ func _createchatMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getsessionmsgMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getsessionlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -10,6 +10,7 @@ import (
 func main() {
 	// init
 	dal.InitClient()
+	dal.InitDB()
 
 	h := server.Default()
 	h.NoHijackConnPool = true

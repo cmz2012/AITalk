@@ -5,6 +5,7 @@ package chat
 import (
 	"context"
 	"github.com/cmz2012/AITalk/biz/service"
+	"github.com/cmz2012/AITalk/dal"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -39,6 +40,12 @@ func GetSessionList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(chat.GetSessionListResp)
+	sessionIds, err := dal.GetSessionByUser(ctx, req.UserID)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	resp.Sessions = sessionIds
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -55,6 +62,23 @@ func GetSessionMsg(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(chat.GetSessionMsgResp)
+	msg, err := dal.GetMessageBySession(ctx, req.SessionID)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	respMsg := make([]*chat.Message, len(msg))
+	for index, m := range msg {
+		respMsg[index] = &chat.Message{
+			ID:         m.ID,
+			SessionID:  m.SessionID,
+			UserID:     m.UserID,
+			Data:       m.Data,
+			CreateTime: m.CreateTime.Unix(),
+			UpdateTime: m.UpdateTime.Unix(),
+		}
+	}
+	resp.Messages = respMsg
 
 	c.JSON(consts.StatusOK, resp)
 }

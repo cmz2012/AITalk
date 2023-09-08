@@ -35,7 +35,7 @@ func GetSessionByUser(ctx context.Context, userID int64) (sessions []int64, err 
 // GetMessageBySession 查询会话内的消息
 func GetMessageBySession(ctx context.Context, sessionID int64) (msg []*_model.Message, err error) {
 	msg = make([]*_model.Message, 0)
-	err = db.Where("session_id = ?", sessionID).Find(&msg).Error
+	err = db.Model(&_model.Message{}).Where("session_id = ?", sessionID).Find(&msg).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		logrus.Errorf("[GetMessageBySession]: %v", err)
 		return

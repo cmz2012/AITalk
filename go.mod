@@ -5,15 +5,11 @@ go 1.18
 require (
 	github.com/apache/thrift v0.13.0
 	github.com/cloudwego/hertz v0.6.7
-	github.com/go-audio/aiff v1.1.0
-	github.com/go-audio/audio v1.0.0
-	github.com/go-audio/wav v1.1.0
 	github.com/google/uuid v1.3.1
-	github.com/gordonklaus/portaudio v0.0.0-20230709114228-aafa478834f5
-	github.com/gorilla/websocket v1.5.0
 	github.com/hertz-contrib/websocket v0.0.1
 	github.com/sashabaranov/go-openai v1.14.2
 	github.com/sirupsen/logrus v1.9.3
+	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b
 	gorm.io/gen v0.3.23
 	gorm.io/gorm v1.25.4
 	gorm.io/plugin/dbresolver v1.4.7
@@ -26,7 +22,6 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/cloudwego/netpoll v0.3.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/go-audio/riff v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
@@ -46,6 +41,5 @@ require (
 	golang.org/x/tools v0.6.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gorm.io/datatypes v1.1.1-0.20230130040222-c43177d3cf8c // indirect
-	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b // indirect
 	gorm.io/hints v1.1.0 // indirect
 )

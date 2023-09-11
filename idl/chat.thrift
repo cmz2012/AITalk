@@ -1,7 +1,8 @@
 namespace go chat
 
 struct CreateChatReq {
-    1: required i64 user_id
+    1: required i64 user_id     (api.vd = "$ > 0")
+    2: required i64 session_id
 }
 
 struct CreateChatResp {

@@ -32,7 +32,8 @@ const mutations = {
                         sender: payload.sender,
                         receiver: payload.receiver,
                         time: payload.time,
-                        audio: payload.audio
+                        audio: payload.audio,
+                        id: payload.id,
                     })
                 }
             }
@@ -47,7 +48,8 @@ const mutations = {
                     sender: payload.sender,
                     receiver: payload.receiver,
                     time: payload.time,
-                    audio: payload.audio
+                    audio: payload.audio,
+                    id: payload.id,
                 })
             }
         }

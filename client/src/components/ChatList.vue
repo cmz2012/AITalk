@@ -76,6 +76,7 @@ export default {
         }
     },
     methods: {
+        // 播放音频
         playAudio(url) {
           this.audio.src = url
             this.audio.play()
@@ -97,6 +98,7 @@ export default {
             console.log("停止录音");
             this.recorder.stop();
         },
+        // 接受websocket消息
         onMessage: function (e) {
             const newbolb = new Blob([e.data], { type: 'audio/wav' })
             const audioSrc = URL.createObjectURL(newbolb);
@@ -112,6 +114,7 @@ export default {
             this.scrollToBottom()
             this.focusTxtContent()
         },
+        // 录制消息
         recordMsg: function () {
             if (this.state === 'start') {
                 // 开始录音
@@ -126,7 +129,7 @@ export default {
                 // this.playAudio(audioSrc)
 
                 this.$store.commit('SEND_MESSAGE', {
-                    content: 'audio_text',
+                    content: 'transcribing...',
                     sender: 'user',
                     receiver: this.bots[this.currentBotIndex].name,
                     time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
@@ -143,53 +146,6 @@ export default {
                 // write to server
                 this.ws.send(blob)
             }
-
-            // // save user's message
-            // if (this.content == '') {
-            //     Toast('Please enter your prompt.')
-            //     return
-            // }
-            // this.$store.commit('SEND_MESSAGE', {
-            //     content: this.content,
-            //     sender: 'user',
-            //     receiver: this.bots[this.currentBotIndex].name,
-            //     time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss')
-            // })
-            //
-            // // Make the dialog box go to the bottom
-            // // Maybe it is Duplicate
-            // this.$nextTick(() => {
-            //     this.$refs.messagesRef.scrollTop = this.$refs.messagesRef.scrollHeight
-            // })
-            //
-            // // make a request to server
-            // const param = {
-            //     'bot': this.bots[this.currentBotIndex].name,
-            //     'prompt': this.content,
-            // }
-            // const path = `http://${window.location.hostname}:5000/get_answer`
-            // axios.post(path, param)
-            //     .then((res) => {
-            //         this.$store.commit('SEND_MESSAGE', {
-            //             content: res.data['answer'],
-            //             sender: this.bots[this.currentBotIndex].name,
-            //             receiver: 'user',
-            //             time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss')
-            //         })
-            //     })
-            //     .catch((error) => {
-            //         this.$store.commit('SEND_MESSAGE', {
-            //             content: `${this.bots[this.currentBotIndex].name} happened error: ${error}`,
-            //             sender: this.bots[this.currentBotIndex].name,
-            //             receiver: 'user',
-            //             time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss')
-            //         })
-            //     })
-            //
-            // this.content = ''
-            //
-            // this.scrollToBottom()
-            // this.focusTxtContent()
         },
 
         // focus the input box

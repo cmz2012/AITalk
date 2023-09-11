@@ -7,6 +7,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"time"
 )
 
 var (
@@ -42,5 +43,12 @@ func GetMessageBySession(ctx context.Context, sessionID int64) (msg []*_model.Me
 		logrus.Errorf("[GetMessageBySession]: %v", err)
 		return
 	}
+	return
+}
+
+func InsertMsg(ctx context.Context, msg *_model.Message) (err error) {
+	msg.CreateTime = time.Now()
+	msg.UpdateTime = msg.CreateTime
+	err = db.Model(&_model.Message{}).Create(msg).Error
 	return
 }

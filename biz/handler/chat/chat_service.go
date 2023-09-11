@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/cmz2012/AITalk/biz/service"
 	"github.com/cmz2012/AITalk/dal"
+	"github.com/cmz2012/AITalk/utils"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -23,8 +24,21 @@ func CreateChat(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	if req.UserID <= 0 {
+		c.String(consts.StatusBadRequest, "user_id must be > 0")
+		return
+	}
+	if req.SessionID <= 0 {
+		uu, err := utils.GenIntUUID()
+		if err != nil {
+			c.String(consts.StatusBadRequest, err.Error())
+			return
+		}
+		req.SessionID = int64(uu)
+	}
+
 	// upgrade to websocket
-	service.ChatUpgrade(ctx, c)
+	service.ChatUpgrade(ctx, c, &req)
 
 }
 

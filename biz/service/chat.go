@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 )
 
-var upgrader = websocket.HertzUpgrader{}
+var upgrader = websocket.HertzUpgrader{CheckOrigin: func(ctx *app.RequestContext) bool { return true }}
 
 func ChatUpgrade(ctx context.Context, c *app.RequestContext) {
 	err := upgrader.Upgrade(c, ChatHandler)

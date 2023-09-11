@@ -9,6 +9,7 @@ require (
 	github.com/hertz-contrib/websocket v0.0.1
 	github.com/sashabaranov/go-openai v1.14.2
 	github.com/sirupsen/logrus v1.9.3
+	github.com/spf13/cast v1.5.1
 	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b
 	gorm.io/gen v0.3.23
 	gorm.io/gorm v1.25.4

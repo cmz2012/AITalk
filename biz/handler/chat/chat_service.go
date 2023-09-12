@@ -6,7 +6,9 @@ import (
 	"context"
 	"github.com/cmz2012/AITalk/biz/service"
 	"github.com/cmz2012/AITalk/dal"
+	"github.com/cmz2012/AITalk/dal/model"
 	"github.com/cmz2012/AITalk/utils"
+	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -93,6 +95,54 @@ func GetSessionMsg(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 	resp.Messages = respMsg
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// CreateReply .
+// @router /reply [POST]
+func CreateReply(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req chat.CreateReplyReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	reply, err := dal.ChatCompletion(ctx, req.Msg)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	msg := &model.Message{
+		SessionID: req.SessionID,
+		UserID:    0, // bot
+		Data:      reply,
+	}
+	err = dal.InsertMsg(ctx, msg)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	out, err := dal.Text2Speech(ctx, reply)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	dirs := strings.Split(out, "/")
+
+	resp := new(chat.CreateReplyResp)
+	resp.Message = &chat.Message{
+		ID:         msg.ID,
+		SessionID:  msg.SessionID,
+		UserID:     msg.UserID,
+		Data:       msg.Data,
+		CreateTime: msg.CreateTime.Unix(),
+		UpdateTime: msg.UpdateTime.Unix(),
+		AudioKey:   dirs[len(dirs)-1],
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

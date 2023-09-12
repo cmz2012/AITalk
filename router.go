@@ -11,5 +11,6 @@ import (
 func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 	r.POST("/transcribe", handler.Transcribe)
+	r.GET("/audio/:file_name", handler.Audio)
 	// your code ...
 }

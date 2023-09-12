@@ -8,6 +8,9 @@ import (
 	"github.com/cmz2012/AITalk/dal/model"
 	_utils "github.com/cmz2012/AITalk/utils"
 	"github.com/spf13/cast"
+	"io/fs"
+	"io/ioutil"
+	"os"
 )
 
 func Transcribe(ctx context.Context, c *app.RequestContext) {
@@ -43,6 +46,19 @@ func Transcribe(ctx context.Context, c *app.RequestContext) {
 		UserID:    userID,
 		Data:      text,
 	}
+
+	// 写文件
+	name, _ := _utils.GenStrUUID()
+	out := os.Getenv("CURDIR") + "/tmp/" + name + ".wav"
+	f.Seek(0, 0)
+	bs, _ := ioutil.ReadAll(f)
+	err = ioutil.WriteFile(out, bs, fs.ModePerm)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	msg.AudioKey = name + ".wav"
 	err = dal.InsertMsg(ctx, msg)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
@@ -50,4 +66,15 @@ func Transcribe(ctx context.Context, c *app.RequestContext) {
 	}
 
 	c.JSON(consts.StatusOK, msg)
+}
+
+func Audio(ctx context.Context, c *app.RequestContext) {
+	fileName := c.Param("file_name")
+	out := os.Getenv("CURDIR") + "/tmp/" + fileName
+	data, err := ioutil.ReadFile(out)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	c.Data(consts.StatusOK, "audio/wav", data)
 }

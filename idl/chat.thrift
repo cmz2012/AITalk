@@ -8,6 +8,16 @@ struct CreateChatReq {
 struct CreateChatResp {
 }
 
+struct CreateReplyReq {
+    1: required i64 user_id     (api.vd = "$ > 0")
+    2: required i64 session_id  (api.vd = "$ > 0")
+    3: required string msg      (api.vd = "$ != ''")
+}
+
+struct CreateReplyResp {
+    1: required Message message
+}
+
 struct GetSessionListReq {
     1: required i64 user_id
 }
@@ -23,6 +33,7 @@ struct Message {
     4: string data
     5: i64 create_time
     6: i64 update_time
+    7: string audio_key
 }
 
 struct GetSessionMsgReq {
@@ -39,5 +50,6 @@ service ChatService {
     CreateChatResp CreateChat(1: CreateChatReq request) (api.get="/chat");
     GetSessionListResp GetSessionList(1: GetSessionListReq request) (api.get="/session")
     GetSessionMsgResp GetSessionMsg(1: GetSessionMsgReq request) (api.get="/message")
+    CreateReplyResp CreateReply(1: CreateReplyReq request) (api.post="/reply")
 }
 

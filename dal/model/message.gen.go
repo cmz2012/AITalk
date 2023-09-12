@@ -18,6 +18,7 @@ type Message struct {
 	Data       string    `gorm:"column:data;not null" json:"data"`
 	CreateTime time.Time `gorm:"column:create_time;not null;default:CURRENT_TIMESTAMP" json:"create_time"`
 	UpdateTime time.Time `gorm:"column:update_time;not null;default:CURRENT_TIMESTAMP" json:"update_time"`
+	AudioKey   string    `gorm:"column:audio_key;not null;comment:消息的音频key" json:"audio_key"` // 消息的音频key
 }
 
 // TableName Message's table name

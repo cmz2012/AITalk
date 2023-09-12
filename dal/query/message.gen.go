@@ -33,6 +33,7 @@ func newMessage(db *gorm.DB, opts ...gen.DOOption) message {
 	_message.Data = field.NewString(tableName, "data")
 	_message.CreateTime = field.NewTime(tableName, "create_time")
 	_message.UpdateTime = field.NewTime(tableName, "update_time")
+	_message.AudioKey = field.NewString(tableName, "audio_key")
 
 	_message.fillFieldMap()
 
@@ -49,6 +50,7 @@ type message struct {
 	Data       field.String
 	CreateTime field.Time
 	UpdateTime field.Time
+	AudioKey   field.String // 消息的音频key
 
 	fieldMap map[string]field.Expr
 }
@@ -71,6 +73,7 @@ func (m *message) updateTableName(table string) *message {
 	m.Data = field.NewString(table, "data")
 	m.CreateTime = field.NewTime(table, "create_time")
 	m.UpdateTime = field.NewTime(table, "update_time")
+	m.AudioKey = field.NewString(table, "audio_key")
 
 	m.fillFieldMap()
 
@@ -95,13 +98,14 @@ func (m *message) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *message) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 6)
+	m.fieldMap = make(map[string]field.Expr, 7)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["session_id"] = m.SessionID
 	m.fieldMap["user_id"] = m.UserID
 	m.fieldMap["data"] = m.Data
 	m.fieldMap["create_time"] = m.CreateTime
 	m.fieldMap["update_time"] = m.UpdateTime
+	m.fieldMap["audio_key"] = m.AudioKey
 }
 
 func (m message) clone(db *gorm.DB) message {

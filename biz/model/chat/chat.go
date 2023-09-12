@@ -9,8 +9,8 @@ import (
 )
 
 type CreateChatReq struct {
-	UserID    int64 `thrift:"user_id,1,required" form:"user_id,required" json:"user_id,required" query:"user_id,required" vd:"$ > 0"`
-	SessionID int64 `thrift:"session_id,2,required" form:"session_id,required" json:"session_id,required" query:"session_id,required"`
+	UserID    int64 `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required" vd:"$ > 0"`
+	SessionID int64 `thrift:"session_id,2,required" json:"session_id,required" query:"session_id,required"`
 }
 
 func NewCreateChatReq() *CreateChatReq {

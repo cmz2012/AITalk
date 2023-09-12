@@ -52,7 +52,7 @@ export default {
         }
     },
     created () {
-        this.ws = new WebSocket('ws://localhost:8888/chat')
+        this.ws = new WebSocket('ws://localhost:8888/chat?user_id=1&session_id=2')
         this.ws.onmessage = this.onMessage
         console.log('ws init')
         this.recorder = new Recorder({
@@ -78,7 +78,8 @@ export default {
     methods: {
         // 播放音频
         playAudio(url) {
-          this.audio.src = url
+
+          this.audio.src = "http://localhost:8888/audio/"+url
             this.audio.play()
         },
         //开始录音
@@ -100,16 +101,25 @@ export default {
         },
         // 接受websocket消息
         onMessage: function (e) {
-            const newbolb = new Blob([e.data], { type: 'audio/wav' })
-            const audioSrc = URL.createObjectURL(newbolb);
-            this.$store.commit('SEND_MESSAGE', {
-                content: 'audio_text',
+            var res = JSON.parse(e.data)
+            if (res['user_id'] > 0) {
+              this.$store.commit('SEND_MESSAGE', {
+                content: res['data'],
+                sender: 'user',
+                receiver: this.bots[this.currentBotIndex].name,
+                time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+                audio: res['audio_key']
+              })
+            } else {
+              this.$store.commit('SEND_MESSAGE', {
+                content: res['data'],
                 sender: 'bot',
                 receiver: this.bots[this.currentBotIndex].name,
                 time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
-                audio: audioSrc
-            })
-            this.playAudio(audioSrc)
+                audio: res['audio_key']
+              })
+            }
+            this.playAudio(res['audio_key'])
 
             this.scrollToBottom()
             this.focusTxtContent()
@@ -124,17 +134,6 @@ export default {
                 // 完成录音
                 this.stopRecordAudio()
                 var blob = this.recorder.getWAVBlob()
-                const audioSrc = URL.createObjectURL(blob);
-
-                // this.playAudio(audioSrc)
-
-                this.$store.commit('SEND_MESSAGE', {
-                    content: 'transcribing...',
-                    sender: 'user',
-                    receiver: this.bots[this.currentBotIndex].name,
-                    time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
-                    audio: audioSrc
-                })
                 this.state = 'start'
 
                 // Make the dialog box go to the bottom

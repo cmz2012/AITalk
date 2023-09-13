@@ -1,7 +1,7 @@
 <template>
     <section class="top">
         <img :src="avatar">
-        <h2 class="name">{{ bots[currentBotIndex].name }}</h2>
+        <h2 class="name">{{ sessions[currentSessionIndex].name }}</h2>
     </section>
 </template>
 
@@ -10,14 +10,14 @@ export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Header',
     computed: {
-        bots () {
-            return this.$store.state.bots
+      sessions () {
+            return this.$store.state.sessions
         },
-        currentBotIndex () {
-            return this.$store.state.currentBotIndex
+      currentSessionIndex () {
+            return this.$store.state.currentSessionIndex
         },
         avatar () {
-            return  this.$store.state.bots[this.$store.state.currentBotIndex].avatar
+            return  this.$store.state.sessions[this.$store.state.currentSessionIndex].avatar
         }
     }
 }

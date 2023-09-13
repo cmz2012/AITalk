@@ -1,21 +1,73 @@
 // Import and use Vuex
 import Vuex from 'vuex'
 import Vue from 'vue'
-import util from '@/common/util'
+// import util from '@/common/util'
+import axios from 'axios'
 
 Vue.use(Vuex)
 
 // actions in the corresponding component
 const actions = {
     // before the chat, use `bots.json` to load bot_name and init_prompt
-    async fetchBots (context) {
-        try {
-            const response = await fetch('bots.json')
-            const data = await response.json()
-            context.commit('INIT_BOTS', data)
-        } catch (error) {
-            console.error(error)
+    async fetchInit (context) {
+        const session_ids = await context.dispatch('fetchSession')
+        // console.log("session_ids: ", session_ids)
+        for (const s of session_ids) {
+            const messages = await context.dispatch('fetchSessionMsg', s)
+            context.state.sessions[s] = {
+                name: 'bot',
+                avatar: 'assets/' + Math.floor(Math.random() * 10) + '.png',
+                messages: []
+            }
+            // console.log("session: ", context.state.sessions)
+            // console.log("session_message: ", messages)
+            for (const message of messages) {
+                context.commit('SEND_MESSAGE', {
+                    content: message['data'],
+                    sender: message['user_id'],
+                    time: message['create_time'],
+                    session: s,
+                    audio: message['audio_key'],
+                })
+            }
         }
+        context.commit('SET_CURRENT_SESSION', session_ids[0])
+    },
+
+    async fetchSession(context) {
+        // 从服务端拉去user下的session
+        const param = {
+            'user_id': context.state.user_id
+        }
+        const path = `http://${window.location.hostname}:8888/session`;
+        var sessionIDs = []
+        await axios.get(path, {params: param})
+            .then((res) => {
+                // console.log(res.data['sessions'])
+                sessionIDs.push(...res.data['sessions'])
+            })
+            .catch((error) => {
+                console.log(error)
+                return []
+            })
+        return sessionIDs
+    },
+
+    async fetchSessionMsg(context, session_id) {
+        const paramMessage = {
+            'user_id': context.state.user_id,
+            'session_id': session_id
+        }
+        var msg = []
+        const path = `http://${window.location.hostname}:8888/message`
+        await axios.get(path, {params: paramMessage}).then((res) => {
+            // console.log(res.data['messages'])
+            msg.push(...res.data['messages'])
+        }).catch((error) => {
+            console.log(error)
+            return []
+        })
+        return msg
     }
 }
 
@@ -24,106 +76,53 @@ const mutations = {
     SEND_MESSAGE (state, payload) {
         // console.log('SEND_MESSAGE in mutations is called.')
         // bot to user
-        if (payload.receiver === 'user') {
-            for (let bot of state.bots) {
-                if (bot.name === payload.sender) {
-                    bot.messages.push({
-                        content: payload.content,
-                        sender: payload.sender,
-                        receiver: payload.receiver,
-                        time: payload.time,
-                        audio: payload.audio,
-                        id: payload.id,
+        state.sessions[payload.session].messages.push(payload)
+    },
+
+    SET_CURRENT_SESSION (state, value) {
+        // console.log('SET_CURRENT_SESSION in mutation is called.')
+        state.currentSessionIndex = value
+    },
+
+    GET_ALL_SESSION (state) {
+        try {
+            const session_ids = this.commit('FETCH_SESSION')
+            console.log("session_ids: ", session_ids)
+            for (const s of session_ids) {
+                const messages = this.commit("FETCH_SESSION_MSG", s)
+                state.sessions[s] = {
+                    name: 'bot',
+                    avatar: 'assets/' + Math.floor(Math.random() * 10) + '.png',
+                    messages: []
+                }
+                console.log("session message: ", messages)
+                for (const message of messages) {
+                    this.commit('SEND_MESSAGE', {
+                        content: message['data'],
+                        sender: message['user_id'],
+                        time: message['create_time'],
+                        session: s,
+                        audio: message['audio_key'],
                     })
                 }
             }
-            return
+            console.log("session: ", state.sessions)
+        } catch (error) {
+            console.error(error)
         }
-
-        // user to bot
-        for (let bot of state.bots) {
-            if (bot.name === payload.receiver) {
-                bot.messages.push({
-                    content: payload.content,
-                    sender: payload.sender,
-                    receiver: payload.receiver,
-                    time: payload.time,
-                    audio: payload.audio,
-                    id: payload.id,
-                })
-            }
-        }
-
     },
 
-    SET_CURRENT_BOT (state, value) {
-        // console.log('SET_CURRENT_BOT in mutation is called.')
-        state.currentBotIndex = value
-    },
-
-    // before the chat, use `bots.json` to load bot_name and init_prompt
-    INIT_BOTS: function (state, value) {
-        for (let bot_name in value) {
-            let init_prompt = value[bot_name]
-            state.bots.push({
-                name: bot_name,
-                avatar: 'assets/' + Math.floor(Math.random() * 10) + '.png',
-                init_prompt: init_prompt,
-                messages: []
-            })
-        }
-
-        /*
-        Somehow, if I write the code of sending `init_prompt` in `created()` of other components
-        after initializing the data structure of bots,
-        Code does not perform as expected, so I wrote the code here.
-        I speculate that it is due to the asynchronous execution mechanism of js and some mechanisms of vuex.
-        Fortunately, it is not a big problem to write the code here.
-        If you have better suggestions, please contact me.
-         */
-        // before chat to the bot, send the init_prompt to the bot
-        for (let bot of state.bots) {
-            console.log('send init prompt to ', bot.name)
-
-            // user send init prompts of all bots
-            this.commit('SEND_MESSAGE', {
-                content: bot.init_prompt,
-                sender: 'user',
-                receiver: bot.name,
-                time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss')
-            })
-
-            // make a request to server
-            // const param = {
-            //     'bot': bot.name,
-            //     'prompt': bot.init_prompt,
-            // }
-            // const path = `http://${window.location.hostname}:5000/get_answer`
-            // axios.post(path, param)
-            //     .then((res) => {
-            //         this.commit('SEND_MESSAGE', {
-            //             content: res.data['answer'],
-            //             sender: bot.name,
-            //             receiver: 'user',
-            //             time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss')
-            //         })
-            //     })
-            //     .catch((error) => {
-            //         this.commit('SEND_MESSAGE', {
-            //             content: `${bot.name} happened error: ${error}`,
-            //             sender: bot.name,
-            //             receiver: 'user',
-            //             time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss')
-            //         })
-            //     })
-        }
+    // before the chat, use `sessions.json` to load bot_name and init_prompt
+    INIT_SESSIONS: function (state) {
+        console.log("state.sessions: ", state.sessions)
     }
 }
 
 // Storing data
 const state = {
-    currentBotIndex: 0,
-    bots: [],
+    currentSessionIndex: 0,
+    sessions: {},
+    user_id: 1
 }
 
 // Create and export Store

@@ -92,6 +92,7 @@ func GetSessionMsg(ctx context.Context, c *app.RequestContext) {
 			Data:       m.Data,
 			CreateTime: m.CreateTime.Unix(),
 			UpdateTime: m.UpdateTime.Unix(),
+			AudioKey:   m.AudioKey,
 		}
 	}
 	resp.Messages = respMsg

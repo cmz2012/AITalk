@@ -2,16 +2,16 @@
     <div class="sidebar">
         <h2>Bots List</h2>
         <ul class="bot-list">
-            <li v-for="(bot, index) in bots" :key="index"
-                :class="{current: currentBotIndex === index}"
-                @click="selectBot(index)">
+            <li v-for="(value, index) in sessions" :key="index"
+                :class="{current: currentSessionIndex === index}"
+                @click="selectSession(index)">
                 <div class="bot-avatar">
-                    <img :src="bot.avatar" alt="bot avatar"/>
-                    <h6 style="white-space: nowrap;">{{ bot.name }}</h6>
+                    <img :src="value.avatar" alt="bot avatar"/>
+                    <h6 style="white-space: nowrap;">{{ value.name }}</h6>
                 </div>
                 <div class="bot-info">
-                    <p class="last-message">{{ bot.messages[bot.messages.length - 1].content }}</p>
-                    <p class="chat-time">{{ bot.messages[bot.messages.length - 1].time }}</p>
+                    <p class="last-message">{{ value.messages[value.messages.length - 1].content }}</p>
+                    <p class="chat-time">{{ value.messages[value.messages.length - 1].time }}</p>
                 </div>
             </li>
         </ul>
@@ -22,21 +22,21 @@
 export default {
     name: 'SideBar',
     computed: {
-        bots () {
-            return this.$store.state.bots
+        sessions () {
+            return this.$store.state.sessions
         },
-        currentBotIndex () {
-            return this.$store.state.currentBotIndex
+        currentSessionIndex () {
+            return this.$store.state.currentSessionIndex
         }
     },
     methods: {
-        selectBot (index) {
-            this.$store.commit('SET_CURRENT_BOT', index)
+      selectSession (index) {
+            this.$store.commit('SET_CURRENT_SESSION', index)
         },
     },
-    // before the chat, use `bots.json` to load bot_name and init_prompt
+    // before the chat, use `sessions.json` to load bot_name and init_prompt
     created () {
-        this.$store.dispatch('fetchBots')
+        this.$store.dispatch('fetchInit')
     }
 }
 </script>

@@ -3,15 +3,15 @@
         <Header></Header>
         <section ref="messagesRef" class="chatList">
             <ul>
-                <div v-for="(message, index) in bots[currentBotIndex].messages" :key="index">
-                    <li v-if="message.sender ==='user' " class="chat-user">
+                <div v-for="(message, index) in sessions[currentSessionIndex].messages" :key="index">
+                    <li v-if="message.sender > 0 " class="chat-user">
                         <div class="chat-img"><img src="assets/user.png"></div>
-                        <div class="time"><cite>{{ message.sender }}<i>{{ message.time }}</i></cite></div>
+                        <div class="time"><cite>{{ 'user' }}<i>{{ message.time }}</i></cite></div>
                         <div class="chat-content" style="white-space: pre-wrap;" v-text="message.content" v-on:click="playAudio(message.audio)"></div>
                     </li>
-                    <li v-if="message.sender !== 'user'" class="chat-others">
-                        <div class="chat-img"><img :src="bots[currentBotIndex].avatar"></div>
-                        <div class="time"><cite>{{ message.sender }}<i>{{ message.time }}</i></cite></div>
+                    <li v-if="message.sender <= 0" class="chat-others">
+                        <div class="chat-img"><img :src="sessions[currentSessionIndex].avatar"></div>
+                        <div class="time"><cite>{{ 'bot' }}<i>{{ message.time }}</i></cite></div>
                         <div class="chat-content" style="white-space: pre-wrap;" v-text="message.content" v-on:click="playAudio(message.audio)"></div>
                     </li>
                 </div>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import util from '../common/util'
+// import util from '../common/util'
 // import { Toast } from 'mint-ui'
 // import axios from 'axios'
 import Header from './Header.vue'
@@ -52,7 +52,7 @@ export default {
         }
     },
     created () {
-        this.ws = new WebSocket('ws://localhost:8888/chat?user_id=1&session_id=2')
+        this.ws = new WebSocket(`ws://${window.location.hostname}:8888/chat?user_id=${this.user}&session_id=${this.currentSessionIndex}`)
         this.ws.onmessage = this.onMessage
         console.log('ws init')
         this.recorder = new Recorder({
@@ -68,18 +68,21 @@ export default {
         console.log('audio init')
     },
     computed: {
-        currentBotIndex () {
-            return this.$store.state.currentBotIndex
+        currentSessionIndex () {
+            return this.$store.state.currentSessionIndex
         },
-        bots () {
-            return this.$store.state.bots
+        sessions () {
+            return this.$store.state.sessions
+        },
+        user() {
+          return this.$store.state.user_id
         }
     },
     methods: {
         // 播放音频
         playAudio(url) {
 
-          this.audio.src = "http://localhost:8888/audio/"+url
+          this.audio.src = `http://${window.location.hostname}:8888/audio/`+url
             this.audio.play()
         },
         //开始录音
@@ -105,17 +108,15 @@ export default {
             if (res['user_id'] > 0) {
               this.$store.commit('SEND_MESSAGE', {
                 content: res['data'],
-                sender: 'user',
-                receiver: this.bots[this.currentBotIndex].name,
-                time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+                sender: res['user_id'],
+                time: res['create_time'],
                 audio: res['audio_key']
               })
             } else {
               this.$store.commit('SEND_MESSAGE', {
                 content: res['data'],
-                sender: 'bot',
-                receiver: this.bots[this.currentBotIndex].name,
-                time: util.formatDate.format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+                sender: 0,
+                time: res['create_time'],
                 audio: res['audio_key']
               })
             }

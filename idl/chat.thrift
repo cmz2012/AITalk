@@ -19,7 +19,7 @@ struct CreateReplyResp {
 }
 
 struct GetSessionListReq {
-    1: required i64 user_id
+    1: required i64 user_id     (api.vd = "$ > 0", api.query = "user_id")
 }
 
 struct GetSessionListResp {
@@ -37,8 +37,8 @@ struct Message {
 }
 
 struct GetSessionMsgReq {
-    1: required i64 user_id
-    2: required i64 session_id
+    1: required i64 user_id       (api.vd = "$ > 0", api.query = "user_id")
+    2: required i64 session_id    (api.vd = "$ > 0", api.query = "session_id")
 }
 
 struct GetSessionMsgResp {

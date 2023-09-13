@@ -18,4 +18,7 @@ func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
 	root.GET("/chat", append(_createchatMw(), chat.CreateChat)...)
+	root.GET("/message", append(_getsessionmsgMw(), chat.GetSessionMsg)...)
+	root.POST("/reply", append(_createreplyMw(), chat.CreateReply)...)
+	root.GET("/session", append(_getsessionlistMw(), chat.GetSessionList)...)
 }

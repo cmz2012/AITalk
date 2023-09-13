@@ -5,6 +5,10 @@ package chat
 import (
 	"context"
 	"github.com/cmz2012/AITalk/biz/service"
+	"github.com/cmz2012/AITalk/dal"
+	"github.com/cmz2012/AITalk/dal/model"
+	"github.com/cmz2012/AITalk/utils"
+	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -22,7 +26,124 @@ func CreateChat(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// upgrade to websocket
-	service.ChatUpgrade(ctx, c)
+	if req.UserID <= 0 {
+		c.String(consts.StatusBadRequest, "user_id must be > 0")
+		return
+	}
+	if req.SessionID <= 0 {
+		uu, err := utils.GenIntUUID()
+		if err != nil {
+			c.String(consts.StatusBadRequest, err.Error())
+			return
+		}
+		req.SessionID = int64(uu)
+	}
 
+	// upgrade to websocket
+	service.ChatUpgrade(ctx, c, &req)
+
+}
+
+// GetSessionList .
+// @router /session [GET]
+func GetSessionList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req chat.GetSessionListReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(chat.GetSessionListResp)
+	sessionIds, err := dal.GetSessionByUser(ctx, req.UserID)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	resp.Sessions = sessionIds
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GetSessionMsg .
+// @router /message [GET]
+func GetSessionMsg(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req chat.GetSessionMsgReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(chat.GetSessionMsgResp)
+	msg, err := dal.GetMessageBySession(ctx, req.SessionID)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	respMsg := make([]*chat.Message, len(msg))
+	for index, m := range msg {
+		respMsg[index] = &chat.Message{
+			ID:         m.ID,
+			SessionID:  m.SessionID,
+			UserID:     m.UserID,
+			Data:       m.Data,
+			CreateTime: m.CreateTime.Unix(),
+			UpdateTime: m.UpdateTime.Unix(),
+			AudioKey:   m.AudioKey,
+		}
+	}
+	resp.Messages = respMsg
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// CreateReply .
+// @router /reply [POST]
+func CreateReply(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req chat.CreateReplyReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	reply, err := dal.ChatCompletion(ctx, req.Msg)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	msg := &model.Message{
+		SessionID: req.SessionID,
+		UserID:    0, // bot
+		Data:      reply,
+	}
+	err = dal.InsertMsg(ctx, msg)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	out, err := dal.Text2Speech(ctx, reply)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	dirs := strings.Split(out, "/")
+
+	resp := new(chat.CreateReplyResp)
+	resp.Message = &chat.Message{
+		ID:         msg.ID,
+		SessionID:  msg.SessionID,
+		UserID:     msg.UserID,
+		Data:       msg.Data,
+		CreateTime: msg.CreateTime.Unix(),
+		UpdateTime: msg.UpdateTime.Unix(),
+		AudioKey:   dirs[len(dirs)-1],
+	}
+
+	c.JSON(consts.StatusOK, resp)
 }

@@ -36,3 +36,5 @@ _testmain.go
 dumped_hertz_remote_config.json
 /tmp
 /client/tmp
+/client/node_modules/
+/client/.idea/
